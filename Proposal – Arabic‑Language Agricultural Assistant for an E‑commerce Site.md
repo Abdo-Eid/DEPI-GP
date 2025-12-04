@@ -8,7 +8,7 @@ We are building a lightweight Arabic conversational assistant that will sit insi
 The system consists of three major components:
 
 1. **Embedding & Vector Search** – turns queries and product descriptions into dense vectors stored in a vector DB.  
-2. **LLM (3 B‑parameter Arabic model)** – receives the structured product context and crafts the final natural‑language response.
+2. **LLM (1 B‑parameter Arabic model)** – receives the structured product context and crafts the final natural‑language response.
 
 ### 2. Requirements  
 
@@ -21,13 +21,13 @@ The system consists of three major components:
 ### 3. Explanation of the Components  
 
 **Embedding & Vector Search** – encodes products and queries using multilingual embeddings to find semantically similar items.  
-**LLM 3 B** – fine‑tuned on a seed set to generate friendly, grounded replies.  
+**LLM 1 B** – fine‑tuned on a seed set to generate friendly, grounded replies.  
 **Intent Detector** – decides whether to fetch products or only provide general advice.
 
 ### 4. The Process
 
 #### **Stage 1: Data Preparation & Product Embedding (تحضير البيانات وتضمين المنتجات)**
-1. **Extract the product catalogue:** collect product data (CSV/Excel) including `product_id`, `name`, `description`, `price`, `stock_status`, and preferably `category`.  
+1. **Extract the product catalogue:** collect product data (CSV/Excel/JSONL) including `product_id`, `name`, `description`, `price`, `stock_status`, and preferably `category`.  
 2. **Clean and normalize data:** verify completeness and consistency.  
 3. **Generate embeddings:** use a multilingual embedding model (e.g., BGE‑m3) to convert names and descriptions into numerical vectors.  
 4. **Store in a vector database:** load vectors and metadata into PGVector.
@@ -76,7 +76,7 @@ Compose Prompt:
    User question
    │
    ▼
-LLM 3 B → Generate answer (with or without CTA)
+LLM 1 B → Generate answer (with or without CTA)
    │
    ▼
 Display answer in chat UI
