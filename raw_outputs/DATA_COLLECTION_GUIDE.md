@@ -1,75 +1,71 @@
-## Data Files Summary
+## main Data Files Summary
 
-### 1. **Final_agriculture_pages_ar.jsonl**
+### 1. **egy_agri_topics_final_sorted.jsonl**
+
+**Schema (one record per line):**
+
+```jsonl
+{
+    "id": "topic_0001",
+    "topic": "مرض البياض الدقيقي",
+    "subtopic": "أمراض فطرية",
+    "text": "البياض الدقيقي مرض فطري يصيب الأوراق وينتج عنه بقع بيضاء مطوية..."
+}
+```
+
+* **Use:** Final list of agricultural topics + rich answer text, generated from `egy_agri_topics.json` using an LLM (tone/style configurable). Used in the finetuning by making input/prompt templates like: `("اشرحلي" أو "ما هي" أو "يعني اي") + topic + subtopic` and output/response is `text`.
+
+### 2. **videos_data-annotated.jsonl**
+
+**Schema (one record per line):**
+
+```jsonl
+{
+    "video_id": "dQw4w9xx",
+    "title": "كيفية زراعة البصل من البذور",
+    "channel": "بالمختصر المفيد",
+    "published_at": "20230601",
+    "description": "شرح خطوات تحضير التربة وزراعة البصل...",
+    "transcript": "...full transcript text...",
+    "word_count": 3240,
+    "annotation": {
+        "summary": "يوضح الفيديو مراحل زراعة البصل من البذور بدءًا من تجهيز التربة وتحسينها، ثم طريقة الزراعة الصحيحة، وأهم خطوات الري والتسميد والمتابعة حتى مرحلة النمو، مع التركيز على العناية المستمرة لضمان إنتاج جيد.",
+        "conversation": [
+            {
+                "role": "user",
+                "content": "متى أزرع البصل من البذور؟"
+            },
+            {
+                "role": "assistant",
+                "content": "أفضل وقت لزراعة البصل يكون في الربيع بعد زوال الصقيع، أو حسب منطقتك المناخية، المهم أن تكون درجات الحرارة مستقرة والتربة صالحة للإنبات."
+            }
+        ]
+    }
+}
+```
+
+* **Use:** Cleaned & annotated video records for conversational fine-tuning, transforming transcripts into structured dialogue (user/assistant turns) with aligned summaries for training.
+
+### 3. **wiki_QA_responses.jsonl**
 
 **Schema (one record per line):**
 
 ```jsonl
 {
     "article_id": "8773527",
-    "title": "O-إيثيل O-(4-نتروفينيل) فينيل فوسفونوثيوات",
-    "url": "https://ar.wikipedia.org/wiki/...",
-    "summary": "مبيد حشري ينتمي إلى فئة الفوسفونوثيوات...",
-    "full_text": "O-إيثيل O-(4-نتروفينيل) فينيل الفوسفونوثيوات والذي يُعرف اختصارًا باسم إي بي إن...",
-    "word_count": 976
+    "chunk_id": 3,
+    "question": "ما هو آلية عمل إي بي إن؟",
+    "chunk_text": "...نص فقرة من المقال تشرح الآلية...",
+    "response": "يُثبط إي بي إن إنزيم الأستيل كولين استراز مما يؤدي إلى تراكم الأستيل كولين..."
 }
 ```
 
--   **Size:** 1,288 lines
--   **Record Count:** 1,288 articles
--   **Fields:** article_id, title, url, summary, full_text, word_count
--   **Use:** Complete knowledge base for model training
+* **Size:** 500 QA pairs the pipeline didn't fully walk on all Wikipedia chunks for API restrictions
+* **Use:** Sentence/chunk-level QA pairs for fine-tuning (Arabic)
 
+## rag dataset (unique for e-commercea and not used for finetuning)
 
-### 2. **plant_right.jsonl**
-
-**Schema (one record per line):**
-
-```jsonl
-{
-    "plant_name": "الذرة الشامية والرفعية",
-    "source_url": "https://agricash.app/corn-and-sorghum/",
-    "markdown_content": "# الذرة الشامية والرفعية\nمحصول غذائي وصناعي...\n## أهم المعاملات الزراعية..."
-}
-```
-
--   **Size:** 5+ crop guides
--   **Record Count:** 5 documented crops
--   **Fields:** plant_name, source_url, markdown_content
--   **Content:** Structured markdown guides with:
-    -   Land preparation
-    -   Seed specifications
-    -   Planting methods & timing
-    -   Fertilizer schedules
-    -   Irrigation guidelines
-    -   Pest/disease control
-    -   Harvesting procedures
--   **Use:** Practical farmer guidance
-
-### 3. **videos_data.jsonl**
-
-**Schema (one record per line):**
-
-```jsonl
-{
-    "video_id": "OkstHpVvqPA",
-    "title": "زرعة الكسلان @youtubecreators #YuoTubeHighFive",
-    "channel": "بالمختصر المفيد - مسعد نصار",
-    "published_at": "20251128",
-    "description": "",
-    "transcript": "اسهل زرعه ممكن تزرعها عندك هي طبعا التين الشوكي...",
-    "word_count": 308
-}
-```
-
--   **Size:** 51 records
--   **Record Count:** 51 YouTube videos
--   **Fields:** video_id, title, channel, published_at, description, transcript, word_count
--   **Transcript Length:** 300+ to 6,000+ words per video
--   **Topics:** Home gardening, pest control, organic fertilizers, propagation, climate protection
--   **Use:** Conversational training data
-
-### 4. **agricash_rag_dataset.jsonl**
+### 1. **agricash_rag_dataset.jsonl**
 
 **Schema (one record per line):**
 
@@ -89,15 +85,16 @@
 }
 ```
 
--   **Size:** 553 records (Full Catalog)
--   **Record Count:** 553 products
--   **Fields:** id, name, url, in_stock, category_hierarchy, price, short_description, description, combined_description, category_text, rag_context_text
--   **Features:**
-    -   **Contextual Hierarchy:** Full parent-child category paths mapped for every item.
-    -   **Cleaned HTML:** Descriptions stripped of tags for better embedding.
-    -   **Localized RAG Block:** A dedicated `rag_context_text` field formatted in Egyptian Arabic specifically for LLM ingestion.
-    -   **Inventory Aware:** Includes live stock status.
--   **Use:** E-commerce agent inventory, product recommendations, and price queries.
+* **Size:** 553 records (Full Catalog)
+* **Record Count:** 553 products
+* **Fields:** id, name, url, in_stock, category_hierarchy, price, short_description, description, combined_description, category_text, rag_context_text
+* **Features:**
+
+  * **Contextual Hierarchy:** Full parent-child category paths mapped for every item.
+  * **Cleaned HTML:** Descriptions stripped of tags for better embedding.
+  * **Localized RAG Block:** A dedicated `rag_context_text` field formatted in Egyptian Arabic specifically for LLM ingestion.
+  * **Inventory Aware:** Includes live stock status.
+* **Use:** E-commerce agent inventory, product recommendations, and price queries.
 
 ---
 
@@ -107,37 +104,33 @@
 
 1. **Wikipedia (Arabic Edition)**
 
-    - Articles on agriculture, farming, and botany
-    - Structured, encyclopedic content
-    - High quality, verified information
+   * Articles on agriculture, farming, and botany
+   * Structured, encyclopedic content
+   * High quality, verified information
 
 2. **YouTube Agricultural Channels**
 
-    - Channel: "بالمختصر المفيد" (Condensed Useful Information)
-    - Creator: Mesad Nassar
-    - Focus: Practical, accessible agriculture guidance in colloquial Arabic
+   * Channel: "بالمختصر المفيد" (Condensed Useful Information)
+   * Creator: Mesad Nassar
+   * Focus: Practical, accessible agriculture guidance in colloquial Arabic
 
 3. **Agricultural Websites**
-    - Professional farming guides and documentation
-    - Technical specifications and best practices
-    - Crop-specific cultivation guidelines
+
+   * Professional farming guides and documentation
+   * Technical specifications and best practices
+   * Crop-specific cultivation guidelines
 
 4. **AgriCash E-commerce Store (API)**
-    - Source: `https://agricash.app/wp-json/wc/store/v1/products`
-    - Method: Advanced API traversal with category mapping
-    - Focus: Real-time product inventory, pricing, and hierarchical classification
+
+   * Source: `https://agricash.app/wp-json/wc/store/v1/products`
+   * Method: Advanced API traversal with category mapping
+   * Focus: Real-time product inventory, pricing, and hierarchical classification
 
 ---
 
 ## Data Characteristics
 
 ### Content Diversity
-
--   **Theory:** Wikipedia articles provide foundational knowledge
--   **Practice:** Plant Right guides offer step-by-step instructions
--   **Demonstration:** Videos show real-world application by experts
--   **Accessibility:** Mix of formal and informal language styles
--   **Commercial:** Shop data provides actionable purchasing options (Products, Prices, Availability)
 
 ### Coverage Areas
 
@@ -149,15 +142,62 @@
 6. **Seasonal Considerations:** Winter, spring, summer operations
 7. **Marketplace:** Live inventory of fertilizers, pesticides, seeds, and solar systems
 
----
-
 ## Project Context
 
 This data collection supports the DEPI-GP project's goal to create an **Arabic-Language Agricultural Assistant for an E-commerce Site**. The collected data enables:
 
--   Intelligent product recommendations (Linking problems found in Wikipedia/YouTube to solutions in the Shop)
--   Educational content delivery
--   Farmer guidance and support
--   Market-aware agricultural suggestions
--   Community-based knowledge sharing
--   **Direct Sales:** Converting advice ("You have aphids") into transactions ("Here is `Malathion 57%` for 150 EGP, available now").
+* Intelligent product recommendations (Linking problems found in Wikipedia/YouTube to solutions in the Shop)
+* Educational content delivery
+* Farmer guidance and support
+* Market-aware agricultural suggestions
+* Community-based knowledge sharing
+* Direct Sales: Converting advice ("You have aphids") into transactions ("Here is `Malathion 57%` for 150 EGP, available now").
+
+---
+
+## Intermediate Data (Raw Collection → Processing Artifacts)
+
+**Purpose:** These files represent the **raw collected data and intermediate processing outputs** used to generate the **final datasets for conversational fine-tuning**. They are not directly used as training data (unless explicitly noted), but they are essential for creating the final structured conversations, summaries, and QA pairs.
+
+## Intermediate Files
+
+### `video_urls.txt`
+
+* **Type:** Plain text
+* **Contains:** Raw list of scraped YouTube URLs
+* **Output Produced:** `videos_data.jsonl`
+
+### `videos_data.jsonl`
+
+* **Type:** JSONL (one video per line)
+* **Contains:** Raw scraped video records (video_id, title, channel, transcript, etc.)
+* **Next Step:** Cleaned + enriched into `videos_data-annotated.jsonl`
+  *(summary + structured conversation pairs for fine-tuning)*
+
+### `agriculture_categories_ar.json`
+
+* **Type:** JSON
+* **Contains:** Intermediate Arabic category taxonomy for getting related pages to agriculture topics
+* **Used For:** Generating `agriculture_pages_optimized.json`
+
+### `agriculture_pages_optimized.json`
+
+* **Type:** JSON
+* **Contains:** Intermediate cleaned page drafts (HTML → text cleanups + canonicalization)
+* **Output Produced:** `Final_agriculture_pages_ar.jsonl`
+
+### `egy_agri_topics.json`
+
+* **Type:** JSONL/JSON (raw topics list)
+* **Contains:** Raw agricultural topics (topic + subtopic) used as input to topic text generation
+* **Output Produced:** `egy_agri_topics_final_sorted.jsonl` (after LLM-generated `text` + sorting)
+* **Generation Prompt:** Uses an LLM system prompt to generate long, detailed Arabic text with an Egyptian tone based on (topic, subtopic)
+
+## Processing Notes (How These Fit Together)
+
+* `video_urls.txt` → video scraper → `videos_data.jsonl`
+* `videos_data.jsonl` → cleaning + (LLM/manual) annotation → `videos_data-annotated.jsonl` *(fine-tuning-ready)*
+* `agriculture_categories_ar.json` → category mapping (used during optimization) → `agriculture_pages_optimized.json`
+* `agriculture_pages_optimized.json` → text normalization → `Final_agriculture_pages_ar.jsonl`
+* `Final_agriculture_pages_ar.jsonl` / Wikipedia chunks → QA generation → `wiki_QA_responses.jsonl` *(fine-tuning-ready)*
+* `egy_agri_topics.json` → LLM long-text generation (SYS_PROMPT tone/style configurable) → `egy_agri_topics_final_sorted.jsonl` *(fine-tuning-ready with template way)*
