@@ -1,0 +1,4 @@
+[submodule "AgriBot"]
+	path = AgriBot
+	url = https://github.com/Abdo-Eid/AgriBot.git
+	branch = local-dev
